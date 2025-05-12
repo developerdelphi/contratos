@@ -2,13 +2,15 @@
 FROM python:3.12-bookworm
 
 # Variáveis de ambiente para Rust e o ambiente virtual
-ENV RUSTUP_HOME=/usr/local/rustup \
-    CARGO_HOME=/usr/local/cargo \
-    VENV_PATH=/opt/venv
+# ENV RUSTUP_HOME=/usr/local/rustup \
+#     CARGO_HOME=/usr/local/cargo \
+#     VENV_PATH=/opt/venv
+ENV VENV_PATH=/opt/venv
 
 # Adiciona os diretórios bin do Cargo (Rust) e do venv ao PATH.
 # O venv vem depois no PATH para que seus executáveis (python, pip) tenham precedência.
-ENV PATH=${CARGO_HOME}/bin:${VENV_PATH}/bin:${PATH}
+# ENV PATH=${CARGO_HOME}/bin:${VENV_PATH}/bin:${PATH}
+ENV PATH=${VENV_PATH}/bin:${PATH}
 
 WORKDIR /app
 
@@ -28,7 +30,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Instalar Rust (usando o PATH já configurado com CARGO_HOME)
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable -y
+# RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable -y
 
 # Criar o Ambiente Virtual (usando a variável VENV_PATH)
 RUN python3 -m venv ${VENV_PATH}
