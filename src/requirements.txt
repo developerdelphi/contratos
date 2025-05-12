@@ -1,0 +1,13 @@
+Flask
+pandas
+python-docx
+docx2pdf
+python-dotenv
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+gspread
+oauth2client
+Flask-SQLAlchemy
+Flask-Session
+num2words

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Contrato Gerado com Sucesso</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; background-color: #f4f4f4; display: flex; justify-content: center; align-items: center; min-height: 90vh; }
+        .container { background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.1); text-align: center; }
+        .alert-success { color: #155724; background-color: #d4edda; border-color: #c3e6cb; padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 4px; }
+        a.button {
+            display: inline-block;
+            padding: 12px 25px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #28a745; /* Verde sucesso */
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        a.button:hover {
+            background-color: #218838; /* Verde mais escuro */
+        }
+        a.back-link {
+            display: block;
+            margin-top: 20px;
+            color: #007bff;
+            text-decoration: none;
+        }
+        a.back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <h2>Contrato Gerado!</h2>
+        <p>O contrato para <strong>{{ nome_donatario }}</strong> foi gerado com sucesso.</p>
+        <p>Arquivo PDF: <strong>{{ nome_arquivo_pdf }}</strong></p>
+        
+        <a href="{{ url_for('download_contrato', filename=nome_arquivo_pdf) }}" class="button">Baixar Contrato PDF</a>
+        
+        <br>
+        <a href="{{ url_for('index') }}" class="back-link">Voltar para a Página Inicial</a>
+    </div>
+</body>
+</html>

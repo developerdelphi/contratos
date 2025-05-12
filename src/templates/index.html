@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Contratos de Doação</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; background-color: #f4f4f4; }
+        .container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .alert { padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 4px; }
+        .alert-success { color: #155724; background-color: #d4edda; border-color: #c3e6cb; }
+        .alert-danger { color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; }
+        .alert-warning { color: #856404; background-color: #fff3cd; border-color: #ffeeba; }
+        .alert-info { color: #0c5460; background-color: #d1ecf1; border-color: #bee5eb; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input[type="text"], input[type="url"], input[type="number"], input[type="submit"] { 
+            padding: 10px; 
+            width: calc(100% - 24px); /* Ajustado para padding e borda */
+            margin-bottom:10px; 
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="radio"] { width: auto; margin-right: 5px;}
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gerador de Contratos de Doação</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <h2>Etapa 1: Informar Planilha e Modelo do Google Drive</h2>
+        <form method="POST" action="{{ url_for('index') }}">
+            <div class="form-group">
+                <label for="sheet_url">URL ou ID da Planilha Google (Donatários):</label>
+                <input type="text" id="sheet_url" name="sheet_url" value="{{ sheet_url_value if sheet_url_value else '' }}" required placeholder="Ex: https://docs.google.com/spreadsheets/d/seu_sheet_id/edit">
+            </div>
+            <div class="form-group">
+                <label for="doc_url">URL ou ID do Documento Google (Modelo do Contrato):</label>
+                <input type="text" id="doc_url" name="doc_url" value="{{ doc_url_value if doc_url_value else '' }}" required placeholder="Ex: https://docs.google.com/document/d/seu_doc_id/edit">
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Carregar Dados e Modelo">
+            </div>
+        </form>
+
+        {# --- SEÇÃO PARA EXIBIR DONATÁRIOS E FORMULÁRIO DE GERAÇÃO DE CONTRATO --- #}
+        {% if donatarios_exibicao %}
+        <hr style="margin-top: 30px; margin-bottom: 30px;">
+        <h2>Etapa 2: Selecionar Donatário e Informar Detalhes</h2>
+        
+        {# Este é o formulário que chama a rota 'gerar_contrato' #}
+        <form method="POST" action="{{ url_for('gerar_contrato') }}">
+            
+            {# Campos ocultos para passar dados para a próxima etapa #}
+            <input type="hidden" name="sheet_url" value="{{ sheet_url_value if sheet_url_value else '' }}">
+            <input type="hidden" name="doc_template_path" value="{{ path_template_docx if path_template_docx else '' }}">
+
+            <h3>Donatários Encontrados:</h3>
+            {% if donatarios_exibicao|length > 0 %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Selecionar</th>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for donatario_item_exibicao in donatarios_exibicao %}
+                    <tr>
+                        <td><input type="radio" name="donatario_selecionado_index" value="{{ loop.index0 }}" required></td>
+                        <td>{{ donatario_item_exibicao.get('NOME', 'N/A') }}</td>
+                        <td>{{ donatario_item_exibicao.get('CPF', 'N/A') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>Nenhum donatário qualificado para exibição encontrado na planilha (verifique se as colunas NOME e CPF existem e contêm dados).</p>
+            {% endif %}
+
+            {# Campos para valor e alíquota #}
+            <div class="form-group" style="margin-top: 20px;">
+                <label for="valor_doacao">Valor da Doação (R$):</label>
+                <input type="number" id="valor_doacao" name="valor_doacao" step="0.01" required placeholder="Ex: 1500.00">
+            </div>
+            <div class="form-group">
+                <label for="aliquota">Alíquota (%):</label>
+                <input type="number" id="aliquota" name="aliquota" step="0.01" required placeholder="Ex: 10 (para 10%)">
+            </div>
+            
+            {# Botão para submeter e gerar o contrato #}
+            <div class="form-group">
+                <input type="submit" value="Gerar Contrato">
+            </div>
+        </form>
+        {% else %}
+            {# Mensagem se donatarios_exibicao estiver vazio ou None após a tentativa de carregar #}
+            {# (Isso só aparecerá se o POST da Etapa 1 ocorreu e resultou em nenhum donatário) #}
+            {% if request.method == 'POST' %} 
+                <p style="margin-top:20px;"><i>Nenhum donatário para exibir com base nas URLs fornecidas, ou as colunas NOME/CPF não foram encontradas na planilha. Verifique os logs do servidor para mais detalhes.</i></p>
+            {% endif %}
+        {% endif %}
+        {# --- FIM DA SEÇÃO --- #}
+        
+    </div> {# Fim da class="container" #}
+</body>
+</html>
