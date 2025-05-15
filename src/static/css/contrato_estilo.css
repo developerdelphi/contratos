@@ -1,0 +1,91 @@
+/* static/css/contrato_estilo.css */
+
+@page {
+    size: A4; /* ou letter, etc. */
+    margin: 1.5cm; /* Experimente com margens menores para mais conteúdo por página */
+}
+
+body {
+    font-family: 'Liberation Serif', 'Times New Roman', Times, serif; /* Boas fontes padrão */
+    font-size: 9pt;   /* <<< DIMINUA AQUI (ex: 9pt, 9.5pt, 10pt) para reduzir páginas */
+    line-height: 1.2;  /* Ajuste para legibilidade vs. densidade */
+    text-align: justify; /* <<< PARA JUSTIFICAR O CONTEÚDO */
+    text-rendering: optimizeLegibility; /* Pode melhorar a aparência do texto */
+    -webkit-font-smoothing: antialiased; /* Para renderização mais suave em alguns contextos */
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1 {
+    text-align: center; /* Padrão para títulos, ou center se preferir para CLÁUSULAS */
+    font-weight: bold;
+    font-size: 12pt;
+    margin-top: 1.2em;
+    margin-bottom: 2em;
+    line-height: 1.3; /* Títulos podem ter espaçamento de linha diferente */
+}
+h2 {
+    text-align: center; /* Padrão para títulos, ou center se preferir para CLÁUSULAS */
+    font-weight: bold;
+    font-size: 10pt;
+    margin-top: 1.2em;
+    margin-bottom: 0.6em;
+    line-height: 1.2; /* Títulos podem ter espaçamento de linha diferente */
+}
+h4, h5, h6 {
+    font-size: 10pt;
+    text-align: left;
+    font-weight: bold;
+    margin-top: 1.2em;
+    margin-bottom: 0.6em;
+    line-height: 1.2; /* Títulos podem ter espaçamento de linha diferente */
+}
+
+/* Se você usou ## para CLÁUSULAS no Markdown, elas serão <h2> */
+h3 { /* Estilo para CLÁUSULA X */
+    font-size: 9pt; /* Um pouco maior que o corpo */
+    text-align: left;
+    margin-top: 1.5em;
+    margin-bottom: 1em;
+    font-weight: bold;
+    border-top: 1px solid #777; /* Linha acima */
+}
+
+p {
+    margin-top: 0;
+    margin-bottom: 0.6em; /* Ajuste o espaçamento entre parágrafos */
+}
+
+strong, b {
+    font-weight: bold;
+}
+
+em, i {
+    font-style: italic;
+}
+
+/* Para as linhas de assinatura (se você usou divs) */
+div.assinaturas { /* Adicione class="assinatura" aos seus divs no MD se quiser um estilo específico */
+    text-align: center;
+    margin-top: 25px;
+    margin-bottom: 5px;
+    line-height: 1.2;
+}
+div.assinaturas p { /* Para remover margem de parágrafos dentro da div de assinatura */
+    margin-bottom: 2px;
+    text-align: center;
+}
+
+/* Para as testemunhas */
+.testemunhas {
+    margin-top: 30px;
+}
+.testemunhas p {
+    margin-bottom: 15px; /* Espaço maior entre cada testemunha */
+    line-height:1.0;
+}
+
+/* Se precisar de mais espaço antes das testemunhas ou no final da página para assinaturas físicas */
+.espaco-assinatura-final {
+    page-break-inside: avoid; /* Tenta não quebrar esta seção entre páginas */
+    padding-top: 50px; /* Adiciona espaço no topo desta seção */
+}

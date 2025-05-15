@@ -1,7 +1,6 @@
 # utils/contract_processing.py
 import datetime
 from num2words import num2words
-from docx import Document
 import os # Adicionado para os.path.exists e os.makedirs, embora não usado diretamente aqui, mas pode ser útil para funções relacionadas
 
 # Não precisamos de 'app' ou 'current_app' aqui se passarmos o logger
@@ -42,36 +41,34 @@ def preparar_dados_para_contrato(selected_donatario_data, valor_bruto_doacao, al
 
     # !! ADAPTE AS CHAVES DE selected_donatario_data PARA CORRESPONDER ÀS SUAS COLUNAS !!
     substituicoes = {
-        "<<NOME_DONATARIO>>": str(selected_donatario_data.get('NOME', '')).strip().upper(),
-        "<<NACIONALIDADE_DONATARIO>>": str(selected_donatario_data.get('NACIONALIDADE', 'N/D')).strip().lower(),
-        "<<ESTADO_CIVIL_DONATARIO>>": str(selected_donatario_data.get('ESTADO_CIVIL', 'N/D')).strip().lower(),
-        "<<PROFISSAO_DONATARIO>>": str(selected_donatario_data.get('PROFISSAO', 'N/D')).strip().lower(),
-        "<<RG_DONATARIO>>": str(selected_donatario_data.get('RG', 'N/D')).strip().upper(),
-        "<<CPF_DONATARIO>>": str(selected_donatario_data.get('CPF', '')).strip(),
-        "<<ENDERECO_DONATARIO>>": str(selected_donatario_data.get('ENDERECO', 'N/D')).strip().lower().capitalize(),
-        "<<CIDADE_UF_DONATARIO>>": str(selected_donatario_data.get('CIDADE_UF', 'N/D')).strip().capitalize(),
-        "<<CEP_DONATARIO>>": str(selected_donatario_data.get('CEP', 'N/D')).strip(),
-        "<<TELEFONE_DONATARIO>>": str(selected_donatario_data.get('TELEFONE', 'N/D')).strip(),
-        "<<EMAIL_DONATARIO>>": str(selected_donatario_data.get('EMAIL', 'N/D')).strip().lower(),
-        "<<BANCO_DONATARIO>>": str(selected_donatario_data.get('BANCO', 'N/D')).strip().upper(),
-        "<<AGENCIA_DONATARIO>>": str(selected_donatario_data.get('AGENCIA', 'N/D')).strip().upper(),
-        "<<CONTA_DONATARIO>>": str(selected_donatario_data.get('CONTA', 'N/D')).strip().upper(),
-        "<<CONTA_TIPO>>": str(selected_donatario_data.get('OPERACAO', 'N/D')).strip().lower(),
+        "NOME_DONATARIO": str(selected_donatario_data.get('NOME', '')).strip().upper(),
+        "NACIONALIDADE_DONATARIO": str(selected_donatario_data.get('NACIONALIDADE', 'N/D')).strip().lower(),
+        "ESTADO_CIVIL_DONATARIO": str(selected_donatario_data.get('ESTADO_CIVIL', 'N/D')).strip().lower(),
+        "PROFISSAO_DONATARIO": str(selected_donatario_data.get('PROFISSAO', 'N/D')).strip().lower(),
+        "RG_DONATARIO": str(selected_donatario_data.get('RG', 'N/D')).strip().upper(),
+        "CPF_DONATARIO": str(selected_donatario_data.get('CPF', '')).strip(),
+        "ENDERECO_DONATARIO": str(selected_donatario_data.get('ENDERECO', 'N/D')).strip().lower().capitalize(),
+        "CIDADE_UF_DONATARIO": str(selected_donatario_data.get('CIDADE_UF', 'N/D')).strip().capitalize(),
+        "CEP_DONATARIO": str(selected_donatario_data.get('CEP', 'N/D')).strip(),
+        "TELEFONE_DONATARIO": str(selected_donatario_data.get('TELEFONE', 'N/D')).strip(),
+        "EMAIL_DONATARIO": str(selected_donatario_data.get('EMAIL', 'N/D')).strip().lower(),
+        "BANCO_DONATARIO": str(selected_donatario_data.get('BANCO', 'N/D')).strip().upper(),
+        "AGENCIA_DONATARIO": str(selected_donatario_data.get('AGENCIA', 'N/D')).strip().upper(),
+        "CONTA_DONATARIO": str(selected_donatario_data.get('CONTA', 'N/D')).strip().upper(),
+        "CONTA_TIPO": str(selected_donatario_data.get('OPERACAO', 'N/D')).strip().lower(),
 
-        "<<VALOR_BRUTO_DOACAO_NUM>>": f"{valor_bruto_doacao:,.2f}".replace('.', '#').replace(',', '.').replace('#', ','),
-        "<<VALOR_BRUTO_DOACAO_EXTENSO>>": valor_bruto_extenso.upper(),
-        "<<ALIQUOTA_ITCMD_PERCENTUAL>>": f"{aliquota_percentual:,.2f}%".replace('.', ','),
-        "<<VALOR_ITCMD_NUM>>": f"{valor_itcmd:,.2f}".replace('.', '#').replace(',', '.').replace('#', ','),
-        "<<VALOR_ITCMD_EXTENSO>>": valor_itcmd_extenso.upper(),
-        "<<VALOR_LIQUIDO_DOACAO_NUM>>": f"{valor_liquido_doacao:,.2f}".replace('.', '#').replace(',', '.').replace('#', ','),
-        "<<VALOR_LIQUIDO_DOACAO_EXTENSO>>": valor_liquido_extenso.upper(),
-        
-        "<<LOCAL_DATA_COMPLETA>>": data_formatada_extenso.upper(),
+        "VALOR_BRUTO_DOACAO_NUM": f"{valor_bruto_doacao:,.2f}".replace('.', '#').replace(',', '.').replace('#', ','),
+        "VALOR_BRUTO_DOACAO_EXTENSO": valor_bruto_extenso.upper(),
+        "ALIQUOTA_ITCMD_PERCENTUAL": f"{aliquota_percentual:,.2f}%".replace('.', ','),
+        "VALOR_ITCMD_NUM": f"{valor_itcmd:,.2f}".replace('.', '#').replace(',', '.').replace('#', ','),
+        "VALOR_ITCMD_EXTENSO": valor_itcmd_extenso.upper(),
+        "VALOR_LIQUIDO_DOACAO_NUM": f"{valor_liquido_doacao:,.2f}".replace('.', '#').replace(',', '.').replace('#', ','),
+        "VALOR_LIQUIDO_DOACAO_EXTENSO": valor_liquido_extenso.upper(),
+        "LOCAL_DATA_COMPLETA": data_formatada_extenso.upper(),
     }
     app_logger.debug(f"Dicionário de substituições preparado: {substituicoes}")
     return substituicoes
 
-def preencher_contrato_docx(caminho_template, dados_substituicao, app_logger):
     """
     Carrega um template DOCX, substitui os placeholders e retorna o objeto Document modificado.
     Levanta FileNotFoundError se o template não for encontrado, ou outras exceções.

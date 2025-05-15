@@ -44,11 +44,7 @@
             <div class="form-group">
                 <label for="sheet_url">URL ou ID da Planilha Google (Donatários):</label>
                 <input type="text" id="sheet_url" name="sheet_url" value="{{ sheet_url_value if sheet_url_value else '' }}" required placeholder="Ex: https://docs.google.com/spreadsheets/d/seu_sheet_id/edit">
-            </div>
-            <div class="form-group">
-                <label for="doc_url">URL ou ID do Documento Google (Modelo do Contrato):</label>
-                <input type="text" id="doc_url" name="doc_url" value="{{ doc_url_value if doc_url_value else '' }}" required placeholder="Ex: https://docs.google.com/document/d/seu_doc_id/edit">
-            </div>
+            </div>    
             <div class="form-group">
                 <input type="submit" value="Carregar Dados e Modelo">
             </div>
@@ -64,7 +60,20 @@
             
             {# Campos ocultos para passar dados para a próxima etapa #}
             <input type="hidden" name="sheet_url" value="{{ sheet_url_value if sheet_url_value else '' }}">
-            <input type="hidden" name="doc_template_path" value="{{ path_template_docx if path_template_docx else '' }}">
+            {# Campos para valor e alíquota #}
+            <div class="form-group" style="margin-top: 20px;">
+                <label for="valor_doacao">Valor da Doação (R$):</label>
+                <input type="number" id="valor_doacao" name="valor_doacao" step="0.01" required placeholder="Ex: 1500.00">
+            </div>
+            <div class="form-group">
+                <label for="aliquota">Alíquota (%):</label>
+                <input type="number" id="aliquota" name="aliquota" step="0.01" required placeholder="Ex: 10 (para 10%)">
+            </div>
+            
+            {# Botão para submeter e gerar o contrato #}
+            <div class="form-group">
+                <input type="submit" value="Gerar Contrato">
+            </div>
 
             <h3>Donatários Encontrados:</h3>
             {% if donatarios_exibicao|length > 0 %}
@@ -90,20 +99,7 @@
             <p>Nenhum donatário qualificado para exibição encontrado na planilha (verifique se as colunas NOME e CPF existem e contêm dados).</p>
             {% endif %}
 
-            {# Campos para valor e alíquota #}
-            <div class="form-group" style="margin-top: 20px;">
-                <label for="valor_doacao">Valor da Doação (R$):</label>
-                <input type="number" id="valor_doacao" name="valor_doacao" step="0.01" required placeholder="Ex: 1500.00">
-            </div>
-            <div class="form-group">
-                <label for="aliquota">Alíquota (%):</label>
-                <input type="number" id="aliquota" name="aliquota" step="0.01" required placeholder="Ex: 10 (para 10%)">
-            </div>
             
-            {# Botão para submeter e gerar o contrato #}
-            <div class="form-group">
-                <input type="submit" value="Gerar Contrato">
-            </div>
         </form>
         {% else %}
             {# Mensagem se donatarios_exibicao estiver vazio ou None após a tentativa de carregar #}

@@ -1,56 +1,45 @@
-# Usando a imagem Python completa baseada no Debian Bookworm
-FROM python:3.12-bookworm
+# Usando uma imagem Python SLIM baseada no Debian Bookworm
+FROM python:3.12-slim-bookworm
 
-# Variáveis de ambiente para Rust e o ambiente virtual
-# ENV RUSTUP_HOME=/usr/local/rustup \
-#     CARGO_HOME=/usr/local/cargo \
-#     VENV_PATH=/opt/venv
+ENV PYTHONUNBUFFERED 1 # Garante que os logs do Python apareçam imediatamente
 ENV VENV_PATH=/opt/venv
-
-# Adiciona os diretórios bin do Cargo (Rust) e do venv ao PATH.
-# O venv vem depois no PATH para que seus executáveis (python, pip) tenham precedência.
-# ENV PATH=${CARGO_HOME}/bin:${VENV_PATH}/bin:${PATH}
 ENV PATH=${VENV_PATH}/bin:${PATH}
 
+# Define o diretório de trabalho principal da aplicação
 WORKDIR /app
 
 # Instalar dependências de sistema:
-# - build-essential: Para compilar extensões C/C++ (ex: numpy, pandas)
-# - curl: Para baixar o instalador do Rust
-# (Outras bibliotecas -dev podem ser adicionadas aqui se necessário no futuro)
-# Instalar dependências de sistema:
+# - build-essential: Pode ser necessário para compilar algumas extensões Python.
+# - Dependências para WeasyPrint: Pango, Cairo, GDK-PixBuf são as principais.
+# - fonts-liberation: Boas fontes fallback que funcionam bem com WeasyPrint.
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     build-essential \
-    libreoffice \
-    xvfb \
-    fonts-liberation \
-    unoconv \
-    python3-uno && \
+    # Dependências para WeasyPrint e suas sub-dependências
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libcairo2 \
+    libgdk-pixbuf-2.0-0 \
+    libffi-dev \          
+    shared-mime-info \    
+    fonts-liberation && \
     rm -rf /var/lib/apt/lists/*
 
-# Instalar Rust (usando o PATH já configurado com CARGO_HOME)
-# RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable -y
-
-# Criar o Ambiente Virtual (usando a variável VENV_PATH)
+# Criar o Ambiente Virtual
 RUN python3 -m venv ${VENV_PATH}
 
 # Atualizar pip dentro do ambiente virtual
-# (o pip do venv será usado devido à configuração do PATH)
 RUN pip install --upgrade pip
 
-# Copiar o arquivo de requisitos
-COPY ./src/requirements.txt ./
+# Copiar o restante da sua pasta src (que contém app.py, templates/, utils/, etc.) para /app
+COPY ./src/ /app/
 
-# Instalar as dependências Python do requirements.txt
-# --no-cache-dir é uma boa prática para manter as camadas menores, mesmo que o tamanho total não seja o problema principal
+# Instalar as dependências Python
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar o código da sua aplicação (ex: pasta src)
-WORKDIR /src
+# Expõe a porta que o Flask estará rodando (se não definido no docker-compose)
+EXPOSE 8000 
 
-COPY ./src/ /src/
-
+# Comando para executar a aplicação
+# app.py deve estar agora em /app/app.py
 CMD ["python3", "app.py"]
-# ------------------------------------------------------------------------------------
-
