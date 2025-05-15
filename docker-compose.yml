@@ -2,15 +2,15 @@ services:
   web:
     container_name: flask_crewai
     build:
-      args:
-        - FLASK_ENV=development
+      # args:
+        # - FLASK_ENV=development
       context: .
     volumes:
       - ./src:/app
     environment:
       - FLASK_APP=app.py
       - FLASK_ENV=development
-      - TEMPLEATES_AUTO_RELOAD=True
+      - TEMPLATES_AUTO_RELOAD=True
       - PYTHONUNBUFFERED=1
     ports:
       - "8000:8000"

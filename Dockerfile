@@ -31,11 +31,15 @@ RUN python3 -m venv ${VENV_PATH}
 # Atualizar pip dentro do ambiente virtual
 RUN pip install --upgrade pip
 
-# Copiar o restante da sua pasta src (que contém app.py, templates/, utils/, etc.) para /app
-COPY ./src/ /app/
+# Copiar o arquivo de dependências primeiro para aproveitar o cache do Docker
+COPY ./src/requirements.txt /app/requirements.txt
 
 # Instalar as dependências Python
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Copiar o restante da sua pasta src (que contém app.py, templates/, utils/, etc.) para /app
+COPY ./src/ /app/
+
 
 # Expõe a porta que o Flask estará rodando (se não definido no docker-compose)
 EXPOSE 8000 

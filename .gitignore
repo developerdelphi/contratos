@@ -1,5 +1,27 @@
+# Byte-code files
+*.pyc
+__pycache__/
+
+# Virtual environment
+# Ignore the virtual environment directory itself
+/venv/
+/env/
+/.venv/
+
+# Distribution / build outputs
+/dist/
+/build/
+*.egg-info/
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# Editor/IDE specific files
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
 credentials-google.json
-.venv
-venv/
-./src/__pycache__
-./src/templates/markdown_templates/*.*
